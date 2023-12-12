@@ -5,11 +5,6 @@
 using namespace std;
 
 
-bool pq_compare(int idx1, int idx2) {
-    
-}
-
-
 int main() {
     int V, E, K;
     cin >> V >> E >> K;
@@ -29,5 +24,41 @@ int main() {
     vector<int> min_dist(V + 1, MAX_DISTANCE);
     min_dist[K] = 0;
 
-    priority_queue<int, vector<int>, >
+    auto comp_dist = [min_dist](int idx1, int idx2) {
+        return min_dist[idx1] > min_dist[idx2];
+    };
+    priority_queue<int, vector<int>, decltype(comp_dist)> idx_pq {comp_dist};
+
+    for (int idx = 1; idx <= V; idx++) {
+        idx_pq.push(idx);
+    }
+
+    int cur_idx;
+    int new_dist;
+    while (!idx_pq.empty()) {
+        cur_idx = idx_pq.top();
+        cout << cur_idx << ' ';
+
+        if (min_dist[cur_idx] == MAX_DISTANCE) {
+            break;
+        }
+
+        for (const auto& [first, second] : graph[cur_idx]) {
+            new_dist = min_dist[cur_idx] + second;
+            if (new_dist < min_dist[first]) {
+                min_dist[first] = new_dist;
+            }
+        }
+
+        idx_pq.pop();
+    }
+
+    for (vector<int>::iterator it = min_dist.begin() + 1; it != min_dist.end(); it++) {
+        if (*it == MAX_DISTANCE) {
+            cout << "INF" << '\n';
+        }
+        else {
+            cout << *it << '\n';
+        }
+    }
 }
